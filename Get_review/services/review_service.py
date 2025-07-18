@@ -21,7 +21,6 @@ def get_reviews():
     
     for review in reviews:
         review_data = {
-            "user": review['user'],
             "review": review['review'],
             "rating": review['rating'],
             "timestamp": review['timestamp'].strftime('%Y-%m-%d %H:%M:%S')  # Formateamos la fecha

@@ -2,7 +2,6 @@
 class Review:
     def __init__(self, productId, user, review, rating, timestamp):
         self.productId = productId
-        self.user = user
         self.review = review
         self.rating = rating
         self.timestamp = timestamp
