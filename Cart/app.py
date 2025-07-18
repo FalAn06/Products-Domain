@@ -18,19 +18,19 @@ cart_collection = db[config.MONGO_CART_COLLECTION]
 def add_to_cart():
     data = request.get_json()
 
-    if 'userId' not in data or 'productId' not in data:
+    # Validar que los datos necesarios están presentes
+    if 'productId' not in data:
         return jsonify({"error": "Datos incompletos"}), 400
 
     # Preparar el dato del carrito
     cart_item = {
-        "userId": data['userId'],
         "productId": data['productId'],
     }
 
     # Insertar el producto al carrito
     try:
         # Verificar si el producto ya está en el carrito
-        existing_item = cart_collection.find_one({"userId": data['userId'], "productId": data['productId']})
+        existing_item = cart_collection.find_one({"productId": data['productId']})
         if existing_item:
             return jsonify({"message": "El producto ya está en el carrito"}), 200
         cart_collection.insert_one(cart_item)
@@ -41,12 +41,7 @@ def add_to_cart():
 # Ruta para obtener los productos en el carrito
 @app.route('/cart', methods=['GET'])
 def get_cart():
-    user_id = request.args.get('userId')
-    
-    if not user_id:
-        return jsonify({"error": "Falta el userId"}), 400
-    
-    cart_items = cart_collection.find({"userId": user_id})
+    cart_items = cart_collection.find({})
     cart_list = []
     for item in cart_items:
         cart_list.append({
@@ -61,13 +56,8 @@ def get_cart():
 # Ruta para eliminar un producto del carrito
 @app.route('/cart/<product_id>', methods=['DELETE'])
 def remove_from_cart(product_id):
-    user_id = request.args.get('userId')
-    
-    if not user_id:
-        return jsonify({"error": "Falta el userId"}), 400
-    
     try:
-        cart_collection.delete_one({"userId": user_id, "productId": product_id})
+        cart_collection.delete_one({"productId": product_id})
         return jsonify({"message": "Producto eliminado del carrito"}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
