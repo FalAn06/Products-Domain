@@ -23,12 +23,14 @@ jobs:
       run: |
         docker build -t chamorrito/review ./Reviews
         docker build -t chamorrito/get_review ./Get_review
+        docker build -t chamorrito/cart ./Cart
 
     - name: Push images to Docker Hub
       run: |
         docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
         docker push chamorrito/review
         docker push chamorrito/get_review
+        docker push chamorrito/cart
 
     - name: Deploy services to EC2
       uses: appleboy/ssh-action@v1.0.0
@@ -42,11 +44,15 @@ jobs:
           docker rm review || true
           docker stop get_review || true
           docker rm get_review || true
+          docker stop cart || true
+          docker rm cart || true
 
           # D
           docker pull chamorrito/review
           docker pull chamorrito/get_review
+          docker pull chamorrito/cart
 
           # Eje
           docker run -d --name review -p 5000:5000 --restart unless-stopped chamorrito/review
           docker run -d --name get_review -p 5001:5001 --restart unless-stopped chamorrito/get_review
+          docker run -d --name cart -p 5002:5002 --restart unless-stopped chamorrito/cart
