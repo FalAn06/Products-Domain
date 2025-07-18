@@ -18,18 +18,21 @@ cart_collection = db[config.MONGO_CART_COLLECTION]
 def add_to_cart():
     data = request.get_json()
 
-    if 'userId' not in data or 'productId' not in data or 'quantity' not in data:
+    if 'userId' not in data or 'productId' not in data:
         return jsonify({"error": "Datos incompletos"}), 400
 
     # Preparar el dato del carrito
     cart_item = {
         "userId": data['userId'],
         "productId": data['productId'],
-        "quantity": data['quantity'],
     }
 
     # Insertar el producto al carrito
     try:
+        # Verificar si el producto ya está en el carrito
+        existing_item = cart_collection.find_one({"userId": data['userId'], "productId": data['productId']})
+        if existing_item:
+            return jsonify({"message": "El producto ya está en el carrito"}), 200
         cart_collection.insert_one(cart_item)
         return jsonify({"message": "Producto añadido al carrito con éxito"}), 201
     except Exception as e:
@@ -48,7 +51,6 @@ def get_cart():
     for item in cart_items:
         cart_list.append({
             "productId": item['productId'],
-            "quantity": item['quantity']
         })
 
     if not cart_list:
