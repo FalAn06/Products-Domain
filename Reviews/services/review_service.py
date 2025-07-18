@@ -1,5 +1,3 @@
-# Reviews/services/review_service.py
-
 from pymongo import MongoClient
 from flask import request, jsonify
 from datetime import datetime
@@ -15,13 +13,12 @@ def add_review():
     data = request.get_json()
 
     # Validar los datos
-    if 'productId' not in data or 'user' not in data or 'review' not in data or 'rating' not in data:
+    if 'productId' not in data or 'review' not in data or 'rating' not in data:
         return jsonify({"error": "Datos incompletos"}), 400
 
     # Preparar los datos para insertarlos en la base de datos
     review = {
         "productId": data['productId'],
-        "user": data['user'],
         "review": data['review'],
         "rating": data['rating'],
         "timestamp": datetime.now()
